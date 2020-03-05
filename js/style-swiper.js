@@ -20,8 +20,8 @@ var StyleSwiper = function(params){
 		classVisible:StyleSwiper.DEFAULT_CLASS_VISIBLE,
 		classActive:StyleSwiper.DEFAULT_CLASS_ACTIVE,
 		classHidden:StyleSwiper.DEFAULT_CLASS_HIDDEN,
-		classSeo:StyleSwiper.DEFAULT_CLASS_SEO,
 
+		scrollDirection:StyleSwiper.DIRECTION.HORIZONTAL,
 		scrollBehavior:"smooth",
 		scrollDebounce:100, //ms
 
@@ -50,6 +50,9 @@ var StyleSwiper = function(params){
 			}
 
 			el = el || document;
+			if (el === document){
+				console.warn("Did you mean to pass 'document' to StyleSwiper?");
+			}
 			_vars._containerEl = el;
 
 			if (typeof Resizer !== typeof undefined){
@@ -104,7 +107,7 @@ var StyleSwiper = function(params){
 			}
 			while (_vars._paginationEl.firstChild) {
 				_vars._paginationEl.firstChild.removeEventListener("click", _methods._handler_page_click);
-				_vars._paginationEl.firstChild.remove();
+				_vars._paginationEl.removeChild(_vars._paginationEl.firstChild);
 			}
 		},
 
@@ -187,14 +190,13 @@ var StyleSwiper = function(params){
 
 				for (var i = 0; i < slidesLen; i++){
 					var btn = document.createElement("button");
-					btn.innerText = "Slide " + (i + 1);
-					btn.classList.add(_instance.classSeo);
+					btn.setAttribute(_instance.attributePageNum, i);
+					btn.setAttribute("title", "slide " + (i + 1));
+					btn.addEventListener("click", _methods._handler_page_click);
 
 					var page = document.createElement("li");
 					page.classList.add(_instance.classPage);
-					page.setAttribute(_instance.attributePageNum, i);
 					page.appendChild(btn);
-					page.addEventListener("click", _methods._handler_page_click);
 
 					_vars._pages.push(page);
 					_vars._paginationEl.appendChild(page);
@@ -313,12 +315,33 @@ var StyleSwiper = function(params){
 					top + window.innerHeight //Bottom
 				];
 			} else {
-				scrollBounds = [
-					_vars._slideEl.scrollLeft, //Left
-					_vars._slideEl.scrollTop, //Top
-					_vars._slideEl.scrollLeft + _vars._slideEl.clientWidth, //Right
-					_vars._slideEl.scrollTop + _vars._slideEl.clientHeight, //Bottom
-				];
+				switch (_instance.scrollDirection){
+					default:
+					case StyleSwiper.DIRECTION.HORIZONTAL:
+						scrollBounds = [
+							_vars._slideEl.scrollLeft, //Left
+							0, //Top
+							_vars._slideEl.scrollLeft + _vars._slideEl.clientWidth, //Right
+							_vars._slideEl.scrollTop + _vars._slideEl.clientHeight, //Bottom
+						];
+						break;
+					case StyleSwiper.DIRECTION.VERTICAL:
+						scrollBounds = [
+							0, //Left
+							_vars._slideEl.scrollTop, //Top
+							_vars._slideEl.scrollLeft + _vars._slideEl.clientWidth, //Right
+							_vars._slideEl.scrollTop + _vars._slideEl.clientHeight, //Bottom
+						];
+						break;
+					case StyleSwiper.DIRECTION.BOTH:
+						scrollBounds = [
+							_vars._slideEl.scrollLeft, //Left
+							_vars._slideEl.scrollTop, //Top
+							_vars._slideEl.scrollLeft + _vars._slideEl.clientWidth, //Right
+							_vars._slideEl.scrollTop + _vars._slideEl.clientHeight, //Bottom
+						];
+						break;
+				}
 			}
 			return scrollBounds;
 		},
@@ -539,8 +562,8 @@ var StyleSwiper = function(params){
 		classVisible:_vars.classVisible,
 		classActive:_vars.classActive,
 		classHidden:_vars.classHidden,
-		classSeo:_vars.classSeo,
 
+		scrollDirection:_vars.scrollDirection,
 		scrollBehavior:_vars.scrollBehavior,
 		scrollDebounce:_vars.scrollDebounce,
 
@@ -586,7 +609,13 @@ StyleSwiper.DEFAULT_CLASS_PAGE = "style-swiper-page";
 StyleSwiper.DEFAULT_CLASS_VISIBLE = "style-swiper-visible";
 StyleSwiper.DEFAULT_CLASS_ACTIVE = "style-swiper-active";
 StyleSwiper.DEFAULT_CLASS_HIDDEN = "style-swiper-hidden";
-StyleSwiper.DEFAULT_CLASS_SEO = "seo";
+
+StyleSwiper.DIRECTION = {
+	//TODO: Add "auto"
+	HORIZONTAL:"horizontal",
+	VERTICAL:"vertical",
+	BOTH:"both",
+};
 
 //Export via window - change this if you want
 window.StyleSwiper = StyleSwiper;
