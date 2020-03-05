@@ -30,7 +30,9 @@ Supports IE11+ with progressive enhancement - that is IE11 only snaps to items w
 	</div>
 
 	<!-- Optional: Pagination -->
-	<ol class="style-swiper-pagination"></ol>
+	<div class="style-swiper-pagination-wrap">
+		<ol class="style-swiper-pagination"></ol>
+	</div>
 </div>
 ```
 

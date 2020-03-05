@@ -1,7 +1,6 @@
 /* Container */
 .style-swiper-container {
 	position:relative;
-	text-align:center;
 }
 
 .style-swiper-slide-btn-wrap {
@@ -10,7 +9,6 @@
 
 /* Slides */
 .style-swiper-slides {
-	text-align:left; /* Reset from text-align:center above */
 	display:flex;
 	overflow-x:auto;
 	scroll-snap-type:mandatory; /* Fallback if "x" not supported */
@@ -51,6 +49,9 @@
 }
 
 /* Pagination */
+.style-swiper-pagination-wrap {
+	text-align:center;
+}
 .style-swiper-pagination {
 	display:inline-block;
 }
