@@ -1,5 +1,5 @@
 /*
-* style-swiper v1.0.0 Copyright (c) 2020 AJ Savino
+* style-swiper v1.0.1 Copyright (c) 2020 AJ Savino
 * https://github.com/koga73/style-swiper
 * MIT License
 */
@@ -163,6 +163,9 @@ var StyleSwiper = function(params){
 				console.log("StyleSwiper::updateSlides", _vars._slides);
 			}
 			var slidesLen = _vars._slides.length;
+			if (!slidesLen){
+				console.warn("No slides in swiper:\n", _vars._slideEl);
+			}
 
 			//_btnPrevEl
 			_vars._btnPrevEl = _vars._containerEl.querySelector("." + _instance.classBtnPrev);
@@ -497,6 +500,10 @@ var StyleSwiper = function(params){
 		},
 
 		goto:function(index, noScroll){
+			if (!_vars._slides.length){
+				console.warn("Cannot goto slide due to no slides!");
+				return;
+			}
 			index = Math.max(Math.min(index, _vars._slides.length - 1), 0);
 			noScroll = noScroll === true;
 
