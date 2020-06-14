@@ -85,6 +85,24 @@
 			</div>
 		</div>
 
+		<!-- CustomEvent polyfill for IE11 -->
+		<script>
+			(function () {
+				if ( typeof window.CustomEvent === "function" ) return false; //If not IE
+
+				function CustomEvent ( event, params ) {
+					params = params || { bubbles: false, cancelable: false, detail: undefined };
+					var evt = document.createEvent( 'CustomEvent' );
+					evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+					return evt;
+				}
+
+				CustomEvent.prototype = window.Event.prototype;
+
+				window.CustomEvent = CustomEvent;
+			})();
+		</script>
+
 		<!-- Resizer from https://github.com/koga73/Resizer -->
 		<!-- This caches on resize, if you exclude it will still work just no cache -->
 		<script src="js/resizer.js"></script>
@@ -92,8 +110,33 @@
 		<script>
 			var styleSwiper = new StyleSwiper({
 				debug:true,
-				el:document.getElementById("myStyleSwiper")
+				el:document.getElementById("myStyleSwiper"),
+				events:true
 			});
+
+			//If you want to grab initially visible
+			var initialVisible = styleSwiper.getVisible();
+			console.log("Initially visible:", initialVisible);
+
+			//If you want to grab initially active
+			var initialActive = styleSwiper.getActive();
+			console.log("Initially active:", initialActive);
+
+			//If you want to register events when visible or active changes
+			var els = styleSwiper.getSlides();
+			for (var i = 0; i < els.length; i++){
+				var el = els[i];
+
+				//Listen for visibility change
+				el.addEventListener(styleSwiper.eventChangeVisible, function(evt){
+					console.log("Visibility change", evt, evt.detail);
+				});
+
+				//Listen for active change
+				el.addEventListener(styleSwiper.eventChangeActive, function(evt){
+					console.log("Active change", evt, evt.detail);
+				});
+			}
 		</script>
 	</body>
 </html>
