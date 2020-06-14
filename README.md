@@ -1,7 +1,8 @@
 # style-swiper
-Add JS pagination and arrows to a pure CSS swiper
+Add JS pagination, arrows, and events to a pure CSS swiper
 
 Supports IE11+ with progressive enhancement - that is IE11 only snaps to items when scrolling via Touch
+Supports IE11+ with CustomEvent polyfill (in example2.html)
 
 ## HTML
 ```html
@@ -43,12 +44,51 @@ var styleSwiper = new StyleSwiper({
 });
 ```
 
+### Additional JS
+More advanced if you want to know visible/active with events
+
+```javascript
+var styleSwiper = new StyleSwiper({
+	el:document.getElementById("myStyleSwiper"),
+	events:true
+});
+
+//If you want to grab initially visible
+var initialVisible = styleSwiper.getVisible();
+console.log("Initially visible:", initialVisible);
+
+//If you want to grab initially active
+var initialActive = styleSwiper.getActive();
+console.log("Initially active:", initialActive);
+
+//If you want to register events when visible or active changes
+var els = styleSwiper.getSlides();
+for (var i = 0; i < els.length; i++){
+	var el = els[i];
+
+	//Listen for visibility change
+	el.addEventListener(styleSwiper.eventChangeVisible, function(evt){
+		console.log("Visibility change", evt, evt.detail);
+	});
+
+	//Listen for active change
+	el.addEventListener(styleSwiper.eventChangeActive, function(evt){
+		console.log("Active change", evt, evt.detail);
+	});
+}
+```
+
 ## CSS
 Pull in css/style-swiper.css
 
 ## API Reference
 Any of these can be passed into constructor to override or called on the instance
 - **attributePageNum**: String | Attribute to add to page indicating page number | defaullt: *data-page-num*
+
+- **events**: Boolean | Enable javascript events | default: *false*
+- **eventChangeVisible**: String | Event name for visibility change | default: *style-swiper-event-visible*
+- **eventChangeActive**: String | Event name for active change | default: *style-swiper-event-active*
+
 - **classSlides**: String | Class to select slides | default: *style-swiper-slides*
 - **classBtnPrev**: String | Class to select previous button | default: *style-swiper-btn-prev*
 - **classBtnNext**: String | Class to select next button | default: *style-swiper-btn-next*

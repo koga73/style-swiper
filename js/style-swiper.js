@@ -1,5 +1,5 @@
 /*
-* style-swiper v1.0.1 Copyright (c) 2020 AJ Savino
+* style-swiper v1.1.0 Copyright (c) 2020 AJ Savino
 * https://github.com/koga73/style-swiper
 * MIT License
 */
@@ -12,6 +12,11 @@ var StyleSwiper = function(params){
 		debug:false,
 
 		attributePageNum:StyleSwiper.DEFAULT_ATTRIBUTE_PAGE_NUM,
+
+		events:false, //Fire events
+		eventChangeVisible:StyleSwiper.DEFAULT_EVENT_CHANGE_VISIBLE,
+		eventChangeActive:StyleSwiper.DEFAULT_EVENT_CHANGE_ACTIVE,
+
 		classSlides:StyleSwiper.DEFAULT_CLASS_SLIDES,
 		classBtnPrev:StyleSwiper.DEFAULT_CLASS_BTN_PREV,
 		classBtnNext:StyleSwiper.DEFAULT_CLASS_BTN_NEXT,
@@ -355,6 +360,7 @@ var StyleSwiper = function(params){
 				console.log("StyleSwiper::evalVisibility");
 			}
 
+			var dirtyEls = [];
 			var visibleEls = [];
 			var isFirstVisible = false;
 			var isLastVisible = false;
@@ -369,6 +375,10 @@ var StyleSwiper = function(params){
 				if (isVisible){
 					if (!slide.classList.contains(_instance.classVisible)){
 						slide.classList.add(_instance.classVisible);
+						dirtyEls.push({
+							el:slide,
+							isVisible:true
+						});
 					}
 					visibleEls.push(slide);
 
@@ -380,6 +390,10 @@ var StyleSwiper = function(params){
 				} else {
 					if (slide.classList.contains(_instance.classVisible)){
 						slide.classList.remove(_instance.classVisible);
+						dirtyEls.push({
+							el:slide,
+							isVisible:false
+						});
 					}
 					if (page){
 						if (page.classList.contains(_instance.classVisible)){
@@ -393,6 +407,18 @@ var StyleSwiper = function(params){
 				}
 				if (i == slidesLen - 1){
 					isLastVisible = isVisible;
+				}
+			}
+
+			//Events
+			if (_instance.events){
+				for (var i = 0; i < dirtyEls.length; i++){
+					var dirtyEl = dirtyEls[i];
+					dirtyEl.el.dispatchEvent(new CustomEvent(_instance.eventChangeVisible, {
+						detail:{
+							isVisible:dirtyEl.isVisible
+						}
+					}));
 				}
 			}
 
@@ -457,7 +483,7 @@ var StyleSwiper = function(params){
 				}
 			}
 
-			//Classes
+			//Classes + events
 			var hasPages = _vars._pages.length > 0;
 			for (var i = 0; i < slidesLen; i++){
 				var slide = _vars._slides[i];
@@ -466,6 +492,13 @@ var StyleSwiper = function(params){
 				if (i == closestIndex){
 					if (!slide.classList.contains(_instance.classActive)){
 						slide.classList.add(_instance.classActive);
+						if (_instance.events){
+							slide.dispatchEvent(new CustomEvent(_instance.eventChangeActive, {
+								detail:{
+									isActive:true
+								}
+							}));
+						}
 					}
 					if (page){
 						if (!page.classList.contains(_instance.classActive)){
@@ -475,6 +508,13 @@ var StyleSwiper = function(params){
 				} else {
 					if (slide.classList.contains(_instance.classActive)){
 						slide.classList.remove(_instance.classActive);
+						if (_instance.events){
+							slide.dispatchEvent(new CustomEvent(_instance.eventChangeActive, {
+								detail:{
+									isActive:false
+								}
+							}));
+						}
 					}
 					if (page){
 						if (page.classList.contains(_instance.classActive)){
@@ -561,6 +601,11 @@ var StyleSwiper = function(params){
 		debug:_vars.debug,
 
 		attributePageNum:_vars.attributePageNum,
+
+		events:_vars.events,
+		eventChangeVisible:_vars.eventChangeVisible,
+		eventChangeActive:_vars.eventChangeActive,
+
 		classSlides:_vars.classSlides,
 		classBtnPrev:_vars.classBtnPrev,
 		classBtnNext:_vars.classBtnNext,
@@ -608,6 +653,10 @@ var StyleSwiper = function(params){
 
 //Static
 StyleSwiper.DEFAULT_ATTRIBUTE_PAGE_NUM = "data-page-num";
+
+StyleSwiper.DEFAULT_EVENT_CHANGE_VISIBLE = "style-swiper-event-visible";
+StyleSwiper.DEFAULT_EVENT_CHANGE_ACTIVE = "style-swiper-event-active";
+
 StyleSwiper.DEFAULT_CLASS_SLIDES = "style-swiper-slides";
 StyleSwiper.DEFAULT_CLASS_BTN_PREV = "style-swiper-btn-prev";
 StyleSwiper.DEFAULT_CLASS_BTN_NEXT = "style-swiper-btn-next";
